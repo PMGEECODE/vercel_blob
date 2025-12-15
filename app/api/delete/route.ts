@@ -5,6 +5,15 @@ export const runtime = "nodejs"
 
 export async function DELETE(request: Request) {
   try {
+    const token = process.env.BLOB_READ_WRITE_TOKEN
+
+    if (!token) {
+      return NextResponse.json(
+        { error: "Configuration error", message: "BLOB_READ_WRITE_TOKEN is not configured" },
+        { status: 500 },
+      )
+    }
+
     const { searchParams } = new URL(request.url)
     const blobId = searchParams.get("id")
 
@@ -19,7 +28,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Invalid blob ID", message: "Blob ID must be a valid URL" }, { status: 400 })
     }
 
-    await del(blobId)
+    await del(blobId, { token })
 
     return NextResponse.json({ success: true, message: "File deleted successfully" }, { status: 200 })
   } catch (error) {

@@ -5,6 +5,15 @@ export const runtime = "nodejs"
 
 export async function POST(request: Request) {
   try {
+    const token = process.env.BLOB_READ_WRITE_TOKEN
+
+    if (!token) {
+      return NextResponse.json(
+        { error: "Configuration error", message: "BLOB_READ_WRITE_TOKEN is not configured" },
+        { status: 500 },
+      )
+    }
+
     const formData = await request.formData()
     const file = formData.get("file") as File | null
 
@@ -21,6 +30,7 @@ export async function POST(request: Request) {
 
     const blob = await put(file.name, file, {
       access: "public",
+      token,
     })
 
     return NextResponse.json(

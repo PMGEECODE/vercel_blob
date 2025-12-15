@@ -5,7 +5,16 @@ export const runtime = "nodejs"
 
 export async function GET() {
   try {
-    const { blobs } = await list()
+    const token = process.env.BLOB_READ_WRITE_TOKEN
+
+    if (!token) {
+      return NextResponse.json(
+        { error: "Configuration error", message: "BLOB_READ_WRITE_TOKEN is not configured" },
+        { status: 500 },
+      )
+    }
+
+    const { blobs } = await list({ token })
 
     const formattedBlobs = blobs.map((blob) => ({
       id: blob.url,
