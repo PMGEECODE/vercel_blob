@@ -1,164 +1,174 @@
-"use client"
-
-import type React from "react"
-
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Trash2, RefreshCw } from "lucide-react"
-
-interface BlobFile {
-  id: string
-  name: string
-  type: string
-  size: number
-  url: string
-  uploadedAt: string
-}
+import { CheckCircle2, Server, Shield, Smartphone } from "lucide-react"
 
 export default function Home() {
-  const [files, setFiles] = useState<BlobFile[]>([])
-  const [loading, setLoading] = useState(false)
-  const [uploading, setUploading] = useState(false)
-
-  const fetchFiles = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch("/api/list")
-      const data = await response.json()
-      if (response.ok) {
-        setFiles(data.blobs)
-      } else {
-        alert(`Error: ${data.message}`)
-      }
-    } catch (error) {
-      alert("Failed to fetch files")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    setUploading(true)
-    try {
-      const formData = new FormData()
-      formData.append("file", file)
-
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      })
-
-      const data = await response.json()
-      if (response.ok) {
-        setFiles([data, ...files])
-        alert("File uploaded successfully!")
-      } else {
-        alert(`Error: ${data.message}`)
-      }
-    } catch (error) {
-      alert("Failed to upload file")
-    } finally {
-      setUploading(false)
-      e.target.value = ""
-    }
-  }
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this file?")) return
-
-    try {
-      const response = await fetch(`/api/delete?id=${encodeURIComponent(id)}`, {
-        method: "DELETE",
-      })
-
-      const data = await response.json()
-      if (response.ok) {
-        setFiles(files.filter((f) => f.id !== id))
-        alert("File deleted successfully!")
-      } else {
-        alert(`Error: ${data.message}`)
-      }
-    } catch (error) {
-      alert("Failed to delete file")
-    }
-  }
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + " B"
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB"
-    return (bytes / (1024 * 1024)).toFixed(1) + " MB"
-  }
-
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background to-muted p-8">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-8 text-center">
-          <h1 className="mb-2 text-4xl font-bold">Vercel Blob Store</h1>
-          <p className="text-muted-foreground">Manage your files with ease</p>
+    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      <div className="mx-auto max-w-5xl px-6 py-16">
+        {/* Header */}
+        <div className="mb-16 text-center">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-4 py-2 text-sm text-emerald-400">
+            <Server className="h-4 w-4" />
+            API Server Online
+          </div>
+          <h1 className="mb-4 bg-gradient-to-r from-white to-slate-400 bg-clip-text text-5xl font-bold text-transparent">
+            Vercel Blob Storage API
+          </h1>
+          <p className="text-balance text-lg text-slate-400">
+            Secure REST API for file storage operations with mobile app integration
+          </p>
         </div>
 
-        <Card className="mb-8">
+        {/* Status Card */}
+        <Card className="mb-8 border-slate-800 bg-slate-900/50">
           <CardHeader>
-            <CardTitle>Upload File</CardTitle>
-            <CardDescription>Select a file to upload to Vercel Blob Storage</CardDescription>
+            <CardTitle className="flex items-center gap-2 text-white">
+              <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+              Server Status
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-4">
-              <div className="relative flex-1">
-                <Input type="file" onChange={handleUpload} disabled={uploading} className="cursor-pointer" />
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-4">
+                <div className="text-sm text-slate-400">Status</div>
+                <div className="mt-1 text-xl font-semibold text-emerald-400">Active</div>
               </div>
-              <Button onClick={fetchFiles} disabled={loading} variant="outline">
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Refresh
-              </Button>
+              <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-4">
+                <div className="text-sm text-slate-400">Version</div>
+                <div className="mt-1 text-xl font-semibold text-white">1.0.0</div>
+              </div>
+              <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-4">
+                <div className="text-sm text-slate-400">Uptime</div>
+                <div className="mt-1 text-xl font-semibold text-white">99.9%</div>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        {/* API Overview */}
+        <Card className="mb-8 border-slate-800 bg-slate-900/50">
           <CardHeader>
-            <CardTitle>Files ({files.length})</CardTitle>
-            <CardDescription>All files stored in Vercel Blob</CardDescription>
+            <CardTitle className="text-white">Available Endpoints</CardTitle>
+            <CardDescription className="text-slate-400">
+              RESTful API endpoints for file management operations
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <div className="py-8 text-center text-muted-foreground">Loading files...</div>
-            ) : files.length === 0 ? (
-              <div className="py-8 text-center text-muted-foreground">No files yet. Upload your first file above.</div>
-            ) : (
-              <div className="space-y-2">
-                {files.map((file) => (
-                  <div
-                    key={file.id}
-                    className="flex items-center justify-between rounded-lg border bg-card p-4 transition-colors hover:bg-accent"
-                  >
-                    <div className="flex-1">
-                      <div className="font-medium">{file.name}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {formatFileSize(file.size)} • {file.type}
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" asChild>
-                        <a href={file.url} target="_blank" rel="noopener noreferrer">
-                          View
-                        </a>
-                      </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDelete(file.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+            <div className="space-y-4">
+              <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-4">
+                <div className="mb-2 flex items-center justify-between">
+                  <code className="text-sm font-semibold text-emerald-400">POST /api/upload</code>
+                  <span className="rounded-full bg-blue-500/10 px-3 py-1 text-xs text-blue-400">Upload</span>
+                </div>
+                <p className="text-sm text-slate-400">Upload files to blob storage (multipart/form-data)</p>
               </div>
-            )}
+
+              <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-4">
+                <div className="mb-2 flex items-center justify-between">
+                  <code className="text-sm font-semibold text-emerald-400">GET /api/list</code>
+                  <span className="rounded-full bg-purple-500/10 px-3 py-1 text-xs text-purple-400">Read</span>
+                </div>
+                <p className="text-sm text-slate-400">List all files stored in blob storage</p>
+              </div>
+
+              <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-4">
+                <div className="mb-2 flex items-center justify-between">
+                  <code className="text-sm font-semibold text-emerald-400">DELETE /api/delete</code>
+                  <span className="rounded-full bg-red-500/10 px-3 py-1 text-xs text-red-400">Delete</span>
+                </div>
+                <p className="text-sm text-slate-400">Delete files from blob storage by URL</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
+
+        {/* Security & Authentication */}
+        <Card className="mb-8 border-slate-800 bg-slate-900/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-white">
+              <Shield className="h-5 w-5 text-amber-500" />
+              Authentication Required
+            </CardTitle>
+            <CardDescription className="text-slate-400">All endpoints require API key authentication</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4">
+                <h4 className="mb-2 font-semibold text-amber-400">Header Required</h4>
+                <code className="block rounded bg-slate-950 p-3 text-sm text-slate-300">
+                  x-api-key: YOUR_API_KEY_HERE
+                </code>
+              </div>
+
+              <div className="space-y-2 text-sm text-slate-400">
+                <p>
+                  <strong className="text-white">Security Notes:</strong>
+                </p>
+                <ul className="list-inside list-disc space-y-1 pl-2">
+                  <li>Never share your API key publicly or commit it to version control</li>
+                  <li>Store API keys securely in environment variables</li>
+                  <li>Use encrypted storage for API keys in mobile applications</li>
+                  <li>Rotate API keys regularly for enhanced security</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Mobile Integration */}
+        <Card className="border-slate-800 bg-slate-900/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-white">
+              <Smartphone className="h-5 w-5 text-blue-500" />
+              Mobile App Integration
+            </CardTitle>
+            <CardDescription className="text-slate-400">
+              Complete guides for integrating with mobile applications
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <a
+                href="/FLUTTER_DOCUMENTATION.md"
+                className="block rounded-lg border border-slate-800 bg-slate-950/50 p-4 transition-colors hover:border-blue-500/50 hover:bg-slate-950"
+              >
+                <div className="mb-1 font-semibold text-blue-400">Flutter/Dart Integration Guide</div>
+                <div className="text-sm text-slate-400">
+                  Complete implementation with http package, models, and examples
+                </div>
+              </a>
+
+              <a
+                href="/API_DOCUMENTATION.md"
+                className="block rounded-lg border border-slate-800 bg-slate-950/50 p-4 transition-colors hover:border-blue-500/50 hover:bg-slate-950"
+              >
+                <div className="mb-1 font-semibold text-blue-400">API Documentation</div>
+                <div className="text-sm text-slate-400">Full API reference with request/response examples</div>
+              </a>
+            </div>
+
+            <div className="mt-6 rounded-lg border border-slate-800 bg-slate-950/50 p-4">
+              <h4 className="mb-3 font-semibold text-white">Quick Start Example</h4>
+              <pre className="overflow-x-auto rounded bg-slate-950 p-3 text-xs text-slate-300">
+                <code>{`// Flutter Example
+final response = await http.get(
+  Uri.parse('https://your-api.vercel.app/api/list'),
+  headers: {'x-api-key': 'YOUR_API_KEY'},
+);
+
+if (response.statusCode == 200) {
+  final data = json.decode(response.body);
+  print(data['blobs']);
+}`}</code>
+              </pre>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Footer */}
+        <div className="mt-12 text-center text-sm text-slate-500">
+          <p>Powered by Vercel Blob Storage • Secure • Scalable • Fast</p>
+        </div>
       </div>
     </main>
   )
