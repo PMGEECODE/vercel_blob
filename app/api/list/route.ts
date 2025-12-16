@@ -1,17 +1,15 @@
 import { list } from "@vercel/blob"
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
+import { withApiProtection } from "@/lib/api/handler"
 
 export const runtime = "nodejs"
 
-export async function GET() {
-  try {
+export const GET = withApiProtection(
+  async (request: NextRequest) => {
     const token = process.env.BLOB_READ_WRITE_TOKEN
 
     if (!token) {
-      return NextResponse.json(
-        { error: "Configuration error", message: "BLOB_READ_WRITE_TOKEN is not configured" },
-        { status: 500 },
-      )
+      throw new Error("BLOB_READ_WRITE_TOKEN not configured")
     }
 
     const { blobs } = await list({ token })
@@ -25,12 +23,20 @@ export async function GET() {
       uploadedAt: blob.uploadedAt,
     }))
 
-    return NextResponse.json({ blobs: formattedBlobs }, { status: 200 })
-  } catch (error) {
-    console.error("[v0] Error listing blobs:", error)
     return NextResponse.json(
-      { error: "Failed to list files", message: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 },
+      {
+        success: true,
+        data: formattedBlobs,
+        count: formattedBlobs.length,
+      },
+      { status: 200 },
     )
-  }
-}
+  },
+  {
+    rateLimit: {
+      windowMs: 60 * 1000,
+      maxRequests: 60,
+    },
+    requireAuth: true,
+  },
+)

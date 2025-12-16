@@ -1,41 +1,42 @@
 import { del } from "@vercel/blob"
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
+import { withApiProtection } from "@/lib/api/handler"
+import { validateBlobUrl } from "@/lib/security/validation"
 
 export const runtime = "nodejs"
 
-export async function DELETE(request: Request) {
-  try {
+export const DELETE = withApiProtection(
+  async (request: NextRequest) => {
     const token = process.env.BLOB_READ_WRITE_TOKEN
 
     if (!token) {
-      return NextResponse.json(
-        { error: "Configuration error", message: "BLOB_READ_WRITE_TOKEN is not configured" },
-        { status: 500 },
-      )
+      throw new Error("BLOB_READ_WRITE_TOKEN not configured")
     }
 
     const { searchParams } = new URL(request.url)
     const blobId = searchParams.get("id")
 
     if (!blobId) {
-      return NextResponse.json(
-        { error: "Missing blob ID", message: "Please provide a blob ID to delete" },
-        { status: 400 },
-      )
+      throw new Error("Blob ID is required")
     }
 
-    if (!blobId.startsWith("https://")) {
-      return NextResponse.json({ error: "Invalid blob ID", message: "Blob ID must be a valid URL" }, { status: 400 })
-    }
+    validateBlobUrl(blobId)
 
     await del(blobId, { token })
 
-    return NextResponse.json({ success: true, message: "File deleted successfully" }, { status: 200 })
-  } catch (error) {
-    console.error("[v0] Error deleting blob:", error)
     return NextResponse.json(
-      { error: "Failed to delete file", message: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 },
+      {
+        success: true,
+        message: "File deleted successfully",
+      },
+      { status: 200 },
     )
-  }
-}
+  },
+  {
+    rateLimit: {
+      windowMs: 60 * 1000,
+      maxRequests: 30,
+    },
+    requireAuth: true,
+  },
+)

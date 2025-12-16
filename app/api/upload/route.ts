@@ -1,54 +1,55 @@
 import { put } from "@vercel/blob"
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
+import { withApiProtection } from "@/lib/api/handler"
+import { sanitizeFilename, validateFileSize, validateFileType } from "@/lib/security/validation"
 
 export const runtime = "nodejs"
 
-export async function POST(request: Request) {
-  try {
+export const POST = withApiProtection(
+  async (request: NextRequest) => {
     const token = process.env.BLOB_READ_WRITE_TOKEN
 
     if (!token) {
-      return NextResponse.json(
-        { error: "Configuration error", message: "BLOB_READ_WRITE_TOKEN is not configured" },
-        { status: 500 },
-      )
+      throw new Error("BLOB_READ_WRITE_TOKEN not configured")
     }
 
     const formData = await request.formData()
     const file = formData.get("file") as File | null
 
     if (!file) {
-      return NextResponse.json(
-        { error: "No file provided", message: "Please provide a file to upload" },
-        { status: 400 },
-      )
+      throw new Error("No file provided")
     }
 
-    if (file.size === 0) {
-      return NextResponse.json({ error: "Empty file", message: "The uploaded file is empty" }, { status: 400 })
-    }
+    validateFileSize(file.size, 50) // 50MB max
+    validateFileType(file.type)
+    const sanitizedFilename = sanitizeFilename(file.name)
 
-    const blob = await put(file.name, file, {
+    // Upload with sanitized filename
+    const blob = await put(sanitizedFilename, file, {
       access: "public",
       token,
     })
 
     return NextResponse.json(
       {
-        id: blob.url,
-        name: blob.pathname,
-        type: file.type || "application/octet-stream",
-        size: file.size,
-        url: blob.url,
-        uploadedAt: new Date().toISOString(),
+        success: true,
+        data: {
+          id: blob.url,
+          name: blob.pathname,
+          type: file.type || "application/octet-stream",
+          size: file.size,
+          url: blob.url,
+          uploadedAt: new Date().toISOString(),
+        },
       },
       { status: 201 },
     )
-  } catch (error) {
-    console.error("[v0] Error uploading file:", error)
-    return NextResponse.json(
-      { error: "Failed to upload file", message: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 },
-    )
-  }
-}
+  },
+  {
+    rateLimit: {
+      windowMs: 60 * 1000,
+      maxRequests: 20,
+    },
+    requireAuth: true,
+  },
+)
