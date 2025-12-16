@@ -22,7 +22,7 @@ class ApiConfig {
   
   // TODO: Replace with your actual API key
   // For production, load from secure storage or environment variables
-  static const String apiKey = 'YOUR_API_KEY_HERE';
+  static const String apiKey = '7f8e9d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a';
   
   // Request timeout duration
   static const Duration timeout = Duration(seconds: 30);
@@ -37,6 +37,6 @@ class ApiConfig {
   
   // Validate API configuration
   static bool isConfigured() {
-    return apiKey.isNotEmpty && apiKey != 'YOUR_API_KEY_HERE';
+    return apiKey.isNotEmpty && apiKey != '7f8e9d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a';
   }
 }
