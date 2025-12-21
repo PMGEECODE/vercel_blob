@@ -14,25 +14,25 @@ This guide will help you integrate the Vercel Blob API with your Flutter applica
 
 Add the `http` package to your `pubspec.yaml`:
 
-```yaml
+\`\`\`yaml
 dependencies:
   flutter:
     sdk: flutter
   http: ^1.1.0
   mime: ^1.0.4
   http_parser: ^4.0.2
-```
+\`\`\`
 
 Run:
-```bash
+\`\`\`bash
 flutter pub get
-```
+\`\`\`
 
 ### 2. Create API Service Class
 
 Create a new file `lib/services/blob_api_service.dart`:
 
-```dart
+\`\`\`dart
 import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -192,13 +192,13 @@ class BlobFile {
     return '${(size / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB';
   }
 }
-```
+\`\`\`
 
 ### 3. Configure API Service
 
 Create a configuration file `lib/config/api_config.dart`:
 
-```dart
+\`\`\`dart
 class ApiConfig {
   // Replace with your actual Vercel deployment URL
   static const String baseUrl = 'https://your-app.vercel.app';
@@ -207,37 +207,37 @@ class ApiConfig {
   // IMPORTANT: In production, use flutter_dotenv or similar to manage secrets
   static const String apiKey = 'your_api_key_here';
 }
-```
+\`\`\`
 
 **IMPORTANT:** Never commit your API key to version control. Use `flutter_dotenv` package for environment variables:
 
-```yaml
+\`\`\`yaml
 # pubspec.yaml
 dependencies:
   flutter_dotenv: ^5.1.0
-```
+\`\`\`
 
 Create `.env` file:
-```
+\`\`\`
 API_BASE_URL=https://your-app.vercel.app
 API_KEY=your_api_key_here
-```
+\`\`\`
 
 Load in `main.dart`:
-```dart
+\`\`\`dart
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
   runApp(MyApp());
 }
-```
+\`\`\`
 
 ## Usage Examples
 
 ### Example 1: List All Files
 
-```dart
+\`\`\`dart
 import 'package:flutter/material.dart';
 import 'services/blob_api_service.dart';
 import 'config/api_config.dart';
@@ -413,11 +413,11 @@ class _FileListScreenState extends State<FileListScreen> {
     // You can use url_launcher package
   }
 }
-```
+\`\`\`
 
 ### Example 2: Upload File
 
-```dart
+\`\`\`dart
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
@@ -532,13 +532,13 @@ class _FileUploadScreenState extends State<FileUploadScreen> {
     );
   }
 }
-```
+\`\`\`
 
 ### Example 3: Complete App with State Management
 
 For a production app, consider using state management. Here's an example with Provider:
 
-```dart
+\`\`\`dart
 // lib/providers/file_provider.dart
 import 'package:flutter/foundation.dart';
 import '../services/blob_api_service.dart';
@@ -594,13 +594,13 @@ class FileProvider with ChangeNotifier {
     }
   }
 }
-```
+\`\`\`
 
 ## Required Packages
 
 Add these to your `pubspec.yaml`:
 
-```yaml
+\`\`\`yaml
 dependencies:
   flutter:
     sdk: flutter
@@ -612,7 +612,7 @@ dependencies:
   flutter_dotenv: ^5.1.0
   provider: ^6.1.1  # Optional, for state management
   url_launcher: ^6.2.4  # Optional, for opening files
-```
+\`\`\`
 
 ## Error Handling
 
@@ -625,7 +625,7 @@ The API returns standard HTTP status codes:
 
 Always wrap API calls in try-catch blocks and handle errors appropriately:
 
-```dart
+\`\`\`dart
 try {
   final files = await _apiService.listFiles();
   // Handle success
@@ -639,7 +639,7 @@ try {
   // Other errors
   print('Error: $e');
 }
-```
+\`\`\`
 
 ## Security Best Practices
 
@@ -655,7 +655,7 @@ try {
 
 Example test file `test/blob_api_service_test.dart`:
 
-```dart
+\`\`\`dart
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:http/http.dart' as http;
@@ -671,7 +671,7 @@ void main() {
     });
   });
 }
-```
+\`\`\`
 
 ## Troubleshooting
 

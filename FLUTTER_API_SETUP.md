@@ -6,9 +6,9 @@
 
 Your API administrator needs to generate a secure API key using:
 
-```bash
+\`\`\`bash
 openssl rand -hex 32
-```
+\`\`\`
 
 This key should be added to your Vercel project's environment variables as `API_KEY`.
 
@@ -18,69 +18,69 @@ This key should be added to your Vercel project's environment variables as `API_
 
 Edit `lib/config/api_config.dart`:
 
-```dart
+\`\`\`dart
 static const String apiKey = 'your_actual_api_key_here';
-```
+\`\`\`
 
 ⚠️ **WARNING**: Never commit hardcoded API keys to version control!
 
 **Option B: Environment Variables (Recommended)**
 
 1. Install `flutter_dotenv`:
-```yaml
+\`\`\`yaml
 dependencies:
   flutter_dotenv: ^5.1.0
-```
+\`\`\`
 
 2. Create `.env` file in project root:
-```
+\`\`\`
 API_KEY=your_actual_api_key_here
 API_BASE_URL=https://vercel-blob-navy.vercel.app/api
-```
+\`\`\`
 
 3. Add to `.gitignore`:
-```
+\`\`\`
 .env
-```
+\`\`\`
 
 4. Update `api_config.dart`:
-```dart
+\`\`\`dart
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiConfig {
   static String get baseUrl => dotenv.env['API_BASE_URL'] ?? '';
   static String get apiKey => dotenv.env['API_KEY'] ?? '';
 }
-```
+\`\`\`
 
 5. Load in `main.dart`:
-```dart
+\`\`\`dart
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
   runApp(MyApp());
 }
-```
+\`\`\`
 
 **Option C: Secure Storage (Production)**
 
 1. Install `flutter_secure_storage`:
-```yaml
+\`\`\`yaml
 dependencies:
   flutter_secure_storage: ^9.0.0
-```
+\`\`\`
 
 2. Store API key securely:
-```dart
+\`\`\`dart
 final storage = FlutterSecureStorage();
 await storage.write(key: 'api_key', value: 'your_api_key');
-```
+\`\`\`
 
 3. Retrieve when needed:
-```dart
+\`\`\`dart
 final apiKey = await storage.read(key: 'api_key');
-```
+\`\`\`
 
 ### 3. Test the Connection
 
@@ -94,23 +94,23 @@ Run your app and check the Gallery screen. If you see:
 All endpoints require the `x-api-key` header:
 
 ### List Files
-```
+\`\`\`
 GET /api/list
 Headers: x-api-key: your_api_key
-```
+\`\`\`
 
 ### Upload File
-```
+\`\`\`
 POST /api/upload
 Headers: x-api-key: your_api_key
 Body: multipart/form-data with 'file' field
-```
+\`\`\`
 
 ### Delete File
-```
+\`\`\`
 DELETE /api/delete?url=file_url
 Headers: x-api-key: your_api_key
-```
+\`\`\`
 
 ## Security Best Practices
 

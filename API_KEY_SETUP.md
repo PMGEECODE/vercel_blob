@@ -4,9 +4,9 @@
 
 Copy and save this API key securely - you'll need it for your Flutter app:
 
-```
+\`\`\`
 7f8e9d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a
-```
+\`\`\`
 
 **⚠️ IMPORTANT SECURITY NOTES:**
 
@@ -23,7 +23,7 @@ Copy and save this API key securely - you'll need it for your Flutter app:
 
 Open your `config/api_config.dart` file and replace the placeholder with your actual API key:
 
-```dart
+\`\`\`dart
 class ApiConfig {
   // Your deployed Vercel API URL
   static const String baseUrl = 'https://your-domain.vercel.app';
@@ -31,7 +31,7 @@ class ApiConfig {
   // 🔐 Your secure API key - NEVER commit this to Git!
   static const String apiKey = '7f8e9d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a';
 }
-```
+\`\`\`
 
 ### Step 2: Secure the API Key (Production Best Practices)
 
@@ -40,53 +40,53 @@ For production apps, **DO NOT hardcode the API key**. Instead:
 #### Option 1: Environment Variables (Recommended)
 
 1. Install `flutter_dotenv` package:
-```yaml
+\`\`\`yaml
 dependencies:
   flutter_dotenv: ^5.1.0
-```
+\`\`\`
 
 2. Create a `.env` file in your project root:
-```env
+\`\`\`env
 API_KEY=7f8e9d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a
 BASE_URL=https://your-domain.vercel.app
-```
+\`\`\`
 
 3. Add `.env` to your `.gitignore`:
-```gitignore
+\`\`\`gitignore
 .env
 .env.*
-```
+\`\`\`
 
 4. Update `api_config.dart`:
-```dart
+\`\`\`dart
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiConfig {
   static String get baseUrl => dotenv.env['BASE_URL'] ?? '';
   static String get apiKey => dotenv.env['API_KEY'] ?? '';
 }
-```
+\`\`\`
 
 5. Load in `main.dart`:
-```dart
+\`\`\`dart
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
   runApp(MyApp());
 }
-```
+\`\`\`
 
 #### Option 2: Flutter Secure Storage
 
 1. Install package:
-```yaml
+\`\`\`yaml
 dependencies:
   flutter_secure_storage: ^9.0.0
-```
+\`\`\`
 
 2. Store the key securely on first launch:
-```dart
+\`\`\`dart
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 final storage = FlutterSecureStorage();
@@ -96,7 +96,7 @@ await storage.write(key: 'api_key', value: 'your_api_key_here');
 
 // Retrieve when needed
 final apiKey = await storage.read(key: 'api_key');
-```
+\`\`\`
 
 ---
 
@@ -117,7 +117,7 @@ final apiKey = await storage.read(key: 'api_key');
 
 ### Using cURL (Terminal):
 
-```bash
+\`\`\`bash
 # Test list endpoint
 curl -H "x-api-key: 7f8e9d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a" \
   https://your-domain.vercel.app/api/list
@@ -126,7 +126,7 @@ curl -H "x-api-key: 7f8e9d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a
 curl -H "x-api-key: 7f8e9d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a" \
   -F "file=@/path/to/your/file.jpg" \
   https://your-domain.vercel.app/api/upload
-```
+\`\`\`
 
 ### Using Postman:
 
@@ -140,7 +140,7 @@ curl -H "x-api-key: 7f8e9d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a
 
 To generate a new API key:
 
-```bash
+\`\`\`bash
 # On macOS/Linux
 openssl rand -hex 32
 
@@ -148,7 +148,7 @@ openssl rand -hex 32
 $bytes = New-Object byte[] 32
 [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
 [BitConverter]::ToString($bytes).Replace("-", "").ToLower()
-```
+\`\`\`
 
 After generating a new key:
 1. Update the `API_KEY` environment variable in Vercel

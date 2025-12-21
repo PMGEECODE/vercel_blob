@@ -48,7 +48,7 @@ This API has been hardened for production use with enterprise-grade security mea
 
 Add these to your Vercel project:
 
-```bash
+\`\`\`bash
 # Blob Storage (auto-configured with Vercel Blob integration)
 BLOB_READ_WRITE_TOKEN=your_blob_token
 
@@ -60,7 +60,7 @@ JWT_SECRET=your_jwt_secret_here
 
 # CORS (optional, comma-separated list of allowed origins)
 ALLOWED_ORIGINS=https://yourdomain.com,https://app.yourdomain.com
-```
+\`\`\`
 
 ## API Usage
 
@@ -68,17 +68,17 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://app.yourdomain.com
 
 #### Method 1: API Key (Recommended for mobile apps)
 
-```bash
+\`\`\`bash
 curl -H "x-api-key: your_api_key" \
   https://your-api.vercel.app/api/list
-```
+\`\`\`
 
 #### Method 2: JWT Bearer Token (For web sessions)
 
-```bash
+\`\`\`bash
 curl -H "Authorization: Bearer your_jwt_token" \
   https://your-api.vercel.app/api/list
-```
+\`\`\`
 
 ### Endpoints
 
@@ -88,13 +88,13 @@ List all files in blob storage.
 **Rate limit**: 60 requests/minute
 
 **Response**:
-```json
+\`\`\`json
 {
   "success": true,
   "data": [...],
   "count": 5
 }
-```
+\`\`\`
 
 #### POST /api/upload
 Upload a file to blob storage.
@@ -104,15 +104,15 @@ Upload a file to blob storage.
 **Allowed types**: Images, PDFs, text, JSON, videos, audio
 
 **Request**:
-```bash
+\`\`\`bash
 curl -X POST \
   -H "x-api-key: your_api_key" \
   -F "file=@photo.jpg" \
   https://your-api.vercel.app/api/upload
-```
+\`\`\`
 
 **Response**:
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -122,7 +122,7 @@ curl -X POST \
     "size": 12345
   }
 }
-```
+\`\`\`
 
 #### DELETE /api/delete?id=<blob_url>
 Delete a file from blob storage.
@@ -130,21 +130,21 @@ Delete a file from blob storage.
 **Rate limit**: 30 requests/minute
 
 **Request**:
-```bash
+\`\`\`bash
 curl -X DELETE \
   -H "x-api-key: your_api_key" \
   "https://your-api.vercel.app/api/delete?id=https://..."
-```
+\`\`\`
 
 ## Security Best Practices
 
 ### For Production Deployment
 
 1. **Generate strong secrets**:
-   ```bash
+   \`\`\`bash
    openssl rand -hex 32  # For API_KEY
    openssl rand -hex 32  # For JWT_SECRET
-   ```
+   \`\`\`
 
 2. **Configure CORS**: Set `ALLOWED_ORIGINS` to only your trusted domains
 
@@ -192,7 +192,7 @@ Set up alerts for:
 
 Use these test cases to verify security:
 
-```bash
+\`\`\`bash
 # Test 1: No authentication (should fail with 401)
 curl https://your-api.vercel.app/api/list
 
@@ -209,7 +209,7 @@ curl -X POST \
   -H "x-api-key: your_key" \
   -F "file=@malicious.exe" \
   https://your-api.vercel.app/api/upload
-```
+\`\`\`
 
 ## Incident Response
 
